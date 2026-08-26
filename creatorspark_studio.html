@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreatorSpark - YouTube Trend, Script & Thumbnail Studio</title>
+  
+  <meta name="theme-color" content="#f43f5e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CreatorSpark">
+  <link rel="apple-touch-icon" href="https://placehold.co/180x180/f43f5e/ffffff?text=🔥">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+              900: '#881337',
+            },
+            studio: {
+              bg: '#0f0f12',
+              card: '#18181f',
+              border: '#2a2a36',
+              input: '#22222e',
+              accent: '#ff0033'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            impact: ['Impact', 'Bebas Neue', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts for Thumbnails & UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@800;900&family=Oswald:wght@700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f0f12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a2a36;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f52;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #ff0055 0%, #ff5000 50%, #ffcc00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glass-panel {
+      background: rgba(24, 24, 31, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    /* Canvas workspace styling */
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background-size: 20px 20px;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-studio-bg text-gray-100 font-sans min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-50 glass-panel border-b border-studio-border px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-rose-500 to-amber-500 flex items-center justify-center shadow-lg shadow-brand-600/30">
+          <i class="fa-solid font-black text-xl text-white">🔥</i>
+        </div>
+        <div>
+          <span class="text-xl font-black tracking-tight flex items-center gap-1.5">
+            Creator<span class="gradient-text">Spark</span>
+            <span class="text-[10px] bg-brand-900/80 text-brand-500 border border-brand-700/50 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Studio AI</span>
+          </span>
+          <p class="text-xs text-gray-400 hidden sm:block">YouTube Viral Trends • Script AI • Thumbnail Designer</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center bg-studio-input p-1 rounded-xl border border-studio-border">
+        <button onclick="switchTab('trends')" id="tab-trends" class="tab-btn flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-brand-600 text-white shadow">
+          <i class="fa-solid fa-fire"></i>
+          <span>Trends</span>
+        </button>
+        <button onclick="switchTab('script')" id="tab-script" class="tab-btn flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-400 hover:text-white transition-all">
+          <i class="fa-solid fa-scroll"></i>
+          <span>Script Writer</span>
+        </button>
+        <button onclick="switchTab('thumbnail')" id="tab-thumbnail" class="tab-btn flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-400 hover:text-white transition-all">
+          <i class="fa-solid fa-image"></i>
+          <span>Thumbnail Studio</span>
+        </button>
+        <button onclick="switchTab('saved')" id="tab-saved" class="tab-btn flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-400 hover:text-white transition-all">
+          <i class="fa-solid fa-bookmark"></i>
+          <span class="hidden md:inline">Saved</span>
+        </button>
+      </nav>
+
+      <button id="btn-install-app" onclick="installPWA()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-extrabold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-lg transition-all animate-pulse">
+        <i class="fa-solid fa-download"></i>
+        <span class="hidden sm:inline">Install App</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- SECTION 1: TREND RADAR & IDEA FINDER -->
+    <section id="sec-trends" class="space-y-6">
+      <div class="glass-panel p-6 rounded-2xl border border-studio-border relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-brand-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-3xl space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-900/40 border border-brand-700/50 text-brand-500 text-xs font-semibold">
+            <i class="fa-solid fa-bolt"></i> Real-time YouTube Search Grounding
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight">Find What's Trending <span class="gradient-text">Right Now</span></h1>
+          <p class="text-gray-400 text-sm sm:text-base">Uncover viral topics, high-demand search queries, and content gaps tailored to your niche. AI scans real-time web trends to jumpstart your next hit video.</p>
+          
+          <!-- Search & Niche Filter Controls -->
+          <div class="pt-2 flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+              <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input type="text" id="trend-query" placeholder="E.g., AI tools, gaming setups, budget travel, fitness tips..." 
+                class="w-full bg-studio-input border border-studio-border rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-brand-500 transition-colors">
+            </div>
+            
+            <select id="trend-niche" class="bg-studio-input border border-studio-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 transition-colors">
+              <option value="General Tech & AI">Tech & AI</option>
+              <option value="Gaming & Esports">Gaming</option>
+              <option value="Personal Finance & Crypto">Finance & Crypto</option>
+              <option value="Productivity & Self Improvement">Productivity</option>
+              <option value="Fitness & Health">Fitness & Health</option>
+              <option value="Lifestyle & Vlogging">Lifestyle & Travel</option>
+              <option value="Entertainment & Pop Culture">Entertainment</option>
+            </select>
+
+            <button onclick="fetchTrends()" id="btn-fetch-trends" class="bg-gradient-to-r from-brand-600 to-rose-600 hover:from-brand-500 hover:to-rose-500 text-white font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-brand-600/30 transition-all shrink-0">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span>Discover Trends</span>
+            </button>
+          </div>
+
+          <!-- Preset Trend Chips -->
+          <div class="flex flex-wrap items-center gap-2 pt-2 text-xs text-gray-400">
+            <span>Popular now:</span>
+            <button onclick="quickTrend('Latest AI Video Tools 2026')" class="bg-studio-card border border-studio-border hover:border-brand-500 px-2.5 py-1 rounded-lg transition-colors">🤖 AI Video Generators</button>
+            <button onclick="quickTrend('Best Budget Gaming Gear')" class="bg-studio-card border border-studio-border hover:border-brand-500 px-2.5 py-1 rounded-lg transition-colors">🎮 Budget Gaming</button>
+            <button onclick="quickTrend('Side Hustles that actually work')" class="bg-studio-card border border-studio-border hover:border-brand-500 px-2.5 py-1 rounded-lg transition-colors">💰 Side Hustles</button>
+            <button onclick="quickTrend('10 Minute Home Workout')" class="bg-studio-card border border-studio-border hover:border-brand-500 px-2.5 py-1 rounded-lg transition-colors">🏋️ Home Workouts</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="trends-loading" class="hidden py-12 text-center space-y-4">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-500 border-t-transparent"></div>
+        <p class="text-gray-400 text-sm font-medium">Scanning Google Search & YouTube live trends...</p>
+      </div>
+
+      <div id="trends-results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Default Empty State -->
+        <div class="col-span-full py-16 text-center glass-panel rounded-2xl border border-studio-border">
+          <div class="w-16 h-16 bg-studio-input rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl text-brand-500">
+            <i class="fa-solid fa-compass"></i>
+          </div>
+          <h3 class="text-lg font-bold">Ready to find your next viral topic?</h3>
+          <p class="text-gray-400 text-sm max-w-md mx-auto mt-1">Enter a keyword or click 'Discover Trends' to generate live viral video concepts, search queries, and angle breakdowns.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: SCRIPT GENERATOR -->
+    <section id="sec-script" class="hidden space-y-6">
+      <div class="glass-panel p-6 rounded-2xl border border-studio-border">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-900/40 border border-rose-700/50 text-rose-400 text-xs font-semibold mb-2">
+              <i class="fa-solid fa-pen-nib"></i> AI YouTube Scriptwriter
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold">Generate High-Retention Script</h2>
+            <p class="text-gray-400 text-sm mt-1">Craft viral hooks, structured main points, visual/B-roll cues, and SEO metadata.</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button onclick="listenScriptAudio()" id="btn-tts-script" class="bg-studio-input hover:bg-studio-border border border-studio-border px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-volume-high text-brand-500"></i>
+              <span>Listen Hook (TTS)</span>
+            </button>
+            <button onclick="saveCurrentScript()" class="bg-studio-input hover:bg-studio-border border border-studio-border px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-bookmark text-amber-500"></i>
+              <span>Save Script</span>
+            </button>
+            <button onclick="transferToThumbnail()" class="bg-gradient-to-r from-brand-600 to-rose-600 hover:from-brand-500 hover:to-rose-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all">
+              <i class="fa-solid fa-arrow-right"></i>
+              <span>Create Thumbnail For This</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Script Generator Form Input -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 bg-studio-card p-4 rounded-xl border border-studio-border">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Video Topic / Concept Title</label>
+            <input type="text" id="script-topic" placeholder="E.g., How to Build an AI Agent in 10 Minutes with No Code" 
+              class="w-full bg-studio-input border border-studio-border rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">Video Style / Tone</label>
+            <select id="script-style" class="w-full bg-studio-input border border-studio-border rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-brand-500">
+              <option value="Fast-Paced & Punchy (MrBeast style)">Fast-Paced & Punchy</option>
+              <option value="Educational & In-Depth (Veritasium / Marques style)">Educational & In-Depth</option>
+              <option value="Storytelling & Dramatic">Storytelling & Dramatic</option>
+              <option value="Casual & Conversational Vlog">Casual Vlog</option>
+              <option value="Top 10 Listicle / Countdown">Top 10 Listicle</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-3 flex justify-end">
+            <button onclick="generateScript()" id="btn-generate-script" class="bg-brand-600 hover:bg-brand-500 text-white font-bold px-6 py-2.5 rounded-lg text-sm flex items-center gap-2 shadow-md">
+              <i class="fa-solid fa-sparkles"></i>
+              <span>Generate Full Script & SEO Meta</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="script-loading" class="hidden py-12 text-center space-y-4">
+        <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-rose-500 border-t-transparent"></div>
+        <p class="text-gray-400 text-sm font-medium">Writing full high-retention script, timestamped visual cues, and SEO tags...</p>
+      </div>
+
+      <div id="script-output" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left 2 Cols: Main Script Breakdown -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- Viral Title Ideas -->
+          <div class="glass-panel p-5 rounded-xl border border-studio-border">
+            <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between mb-3">
+              <span><i class="fa-solid fa-heading text-brand-500 mr-2"></i> High CTR Title Options</span>
+              <span class="text-xs text-gray-500 font-normal">Click to copy</span>
+            </h3>
+            <div id="titles-container" class="space-y-2 text-sm text-gray-300">
+              <div class="p-3 bg-studio-input rounded-lg border border-studio-border text-gray-500 italic">No script generated yet. Enter a topic above!</div>
+            </div>
+          </div>
+
+          <!-- Video Hook (0-15s) -->
+          <div class="glass-panel p-5 rounded-xl border border-studio-border">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-bold text-rose-400 uppercase tracking-wider"><i class="fa-solid fa-bolt mr-2"></i> The Hook (0 - 15 Seconds)</h3>
+              <button onclick="copyElementText('script-hook-text')" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-copy mr-1"></i>Copy Hook</button>
+            </div>
+            <div id="script-hook-text" class="p-4 bg-studio-input rounded-xl border border-studio-border text-sm leading-relaxed text-gray-200">
+              Generate a script to unlock a retention-optimised hook!
+            </div>
+          </div>
+
+          <!-- Main Body Script & Visual Cues -->
+          <div class="glass-panel p-5 rounded-xl border border-studio-border">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider"><i class="fa-solid fa-film mr-2 text-amber-500"></i> Full Script & B-Roll Cues</h3>
+              <button onclick="copyElementText('script-body-text')" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-copy mr-1"></i>Copy Body</button>
+            </div>
+            <div id="script-body-text" class="p-4 bg-studio-input rounded-xl border border-studio-border text-sm leading-relaxed space-y-4 max-h-[500px] overflow-y-auto">
+              <p class="text-gray-500 italic">Complete script outline with timestamps, B-roll recommendations, sound effect cues, and CTA will appear here.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 1 Col: SEO Metadata & Thumbnail Angles -->
+        <div class="space-y-6">
+          <!-- Thumbnail Concept Suggestions -->
+          <div class="glass-panel p-5 rounded-xl border border-studio-border">
+            <h3 class="text-sm font-bold text-amber-400 uppercase tracking-wider mb-3"><i class="fa-solid fa-lightbulb mr-2"></i> Thumbnail Visual Concepts</h3>
+            <div id="thumbnail-concepts" class="space-y-3 text-xs text-gray-300">
+              <div class="p-3 bg-studio-input rounded-lg border border-studio-border text-gray-500">AI thumbnail concept ideas will be generated here.</div>
+            </div>
+          </div>
+
+          <!-- SEO Description & Tags -->
+          <div class="glass-panel p-5 rounded-xl border border-studio-border">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-bold text-emerald-400 uppercase tracking-wider"><i class="fa-solid fa-tags mr-2"></i> SEO Description & Hashtags</h3>
+              <button onclick="copyElementText('script-seo-text')" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-copy mr-1"></i>Copy SEO</button>
+            </div>
+            <div id="script-seo-text" class="p-3 bg-studio-input rounded-lg border border-studio-border text-xs leading-relaxed text-gray-300 font-mono max-h-60 overflow-y-auto">
+              SEO description, key hashtags, and video tags...
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: THUMBNAIL STUDIO & CAPTION EDITOR -->
+    <section id="sec-thumbnail" class="hidden space-y-6">
+      <div class="glass-panel p-6 rounded-2xl border border-studio-border">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-900/40 border border-amber-700/50 text-amber-400 text-xs font-semibold mb-2">
+              <i class="fa-solid fa-palette"></i> Canvas Thumbnail Studio
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold">Design High-CTR Thumbnail</h2>
+            <p class="text-gray-400 text-sm mt-1">Generate AI visuals, add high-impact text captions, badges, arrows, and download 1280x720 PNG.</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button onclick="downloadThumbnail()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all">
+              <i class="fa-solid fa-download"></i>
+              <span>Download High-Res PNG (1280x720)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thumbnail Studio Grid: Controls Left, Canvas Right -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Panel: Controls (4 cols) -->
+        <div class="lg:col-span-5 space-y-5">
+          
+          <!-- AI Visual Generator Box -->
+          <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-studio-border space-y-3">
+            <h3 class="text-sm font-bold text-gray-200 flex items-center gap-2">
+              <i class="fa-solid fa-wand-magic-sparkles text-brand-500"></i>
+              <span>1. AI Background Visual Generator</span>
+            </h3>
+
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Visual Prompt</label>
+              <textarea id="thumb-ai-prompt" rows="2" placeholder="E.g., Shocked tech reviewer pointing at glowing futuristic holographic laptop screen, cinematic dark studio lighting" 
+                class="w-full bg-studio-input border border-studio-border rounded-lg p-2.5 text-xs focus:outline-none focus:border-brand-500"></textarea>
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="generateAiThumbnailBg()" id="btn-gen-thumb-bg" class="flex-1 bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 shadow">
+                <i class="fa-solid fa-image"></i>
+                <span>Generate AI BG</span>
+              </button>
+              
+              <label class="cursor-pointer bg-studio-input hover:bg-studio-border border border-studio-border px-3 py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 text-gray-300">
+                <i class="fa-solid fa-upload text-blue-400"></i>
+                <span>Upload</span>
+                <input type="file" id="thumb-upload-file" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+              </label>
+            </div>
+          </div>
+
+          <!-- Text Captions Studio Controls -->
+          <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-studio-border space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-gray-200 flex items-center gap-2">
+                <i class="fa-solid fa-font text-amber-400"></i>
+                <span>2. Text Overlay & Captions</span>
+              </h3>
+              <button onclick="addTextLayer()" class="bg-amber-500 hover:bg-amber-400 text-black text-xs font-extrabold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all">
+                <i class="fa-solid fa-plus"></i> Add Caption
+              </button>
+            </div>
+
+            <!-- Active Layer Settings -->
+            <div id="layer-controls" class="space-y-3 p-3 bg-studio-card rounded-xl border border-studio-border">
+              <div class="flex items-center justify-between text-xs text-gray-400">
+                <span id="selected-layer-title" class="font-bold text-white">Select a text layer below</span>
+                <button onclick="deleteSelectedLayer()" id="btn-delete-layer" class="text-rose-400 hover:text-rose-300 hidden"><i class="fa-solid fa-trash mr-1"></i>Delete Layer</button>
+              </div>
+
+              <div>
+                <label class="block text-[11px] text-gray-400 mb-1">Caption Text</label>
+                <input type="text" id="layer-text-input" placeholder="E.g., I TRIED THIS!" oninput="updateActiveLayer()" 
+                  class="w-full bg-studio-input border border-studio-border rounded-lg px-2.5 py-1.5 text-xs">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Font Family</label>
+                  <select id="layer-font-family" onchange="updateActiveLayer()" class="w-full bg-studio-input border border-studio-border rounded-lg p-1.5 text-xs">
+                    <option value="Impact">Impact / Bold</option>
+                    <option value="Anton">Anton (Heavy)</option>
+                    <option value="Bebas Neue">Bebas Neue</option>
+                    <option value="Montserrat">Montserrat Black</option>
+                    <option value="Inter">Inter Sans</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Font Size</label>
+                  <input type="range" id="layer-font-size" min="20" max="150" value="70" oninput="updateActiveLayer()" class="w-full accent-brand-500">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Text Color</label>
+                  <input type="color" id="layer-text-color" value="#ffffff" onchange="updateActiveLayer()" class="w-full h-8 bg-studio-input rounded border border-studio-border cursor-pointer">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Stroke Color</label>
+                  <input type="color" id="layer-stroke-color" value="#000000" onchange="updateActiveLayer()" class="w-full h-8 bg-studio-input rounded border border-studio-border cursor-pointer">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Badge Fill</label>
+                  <input type="color" id="layer-bg-color" value="#ff0033" onchange="updateActiveLayer()" class="w-full h-8 bg-studio-input rounded border border-studio-border cursor-pointer">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Stroke Width</label>
+                  <input type="range" id="layer-stroke-width" min="0" max="20" value="8" oninput="updateActiveLayer()" class="w-full accent-brand-500">
+                </div>
+                <div>
+                  <label class="block text-[11px] text-gray-400 mb-1">Rotation (°)</label>
+                  <input type="range" id="layer-rotation" min="-45" max="45" value="0" oninput="updateActiveLayer()" class="w-full accent-brand-500">
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 pt-1">
+                <input type="checkbox" id="layer-has-bg" onchange="updateActiveLayer()" class="rounded accent-brand-500">
+                <label for="layer-has-bg" class="text-xs text-gray-300">Enable Badge/Pill Background</label>
+              </div>
+            </div>
+
+            <!-- Quick Preset Caption Texts -->
+            <div class="space-y-1.5">
+              <span class="text-[11px] text-gray-400 uppercase tracking-wider font-bold">Quick Viral Badges:</span>
+              <div class="flex flex-wrap gap-1.5">
+                <button onclick="addPresetCaption('MUST WATCH!', '#ff0033')" class="px-2 py-1 bg-red-600 text-white rounded text-[11px] font-bold">🔥 MUST WATCH!</button>
+                <button onclick="addPresetCaption('DON\'T DO THIS!', '#f59e0b')" class="px-2 py-1 bg-amber-500 text-black rounded text-[11px] font-bold">⚠️ DON'T DO THIS!</button>
+                <button onclick="addPresetCaption('100% SECRET', '#10b981')" class="px-2 py-1 bg-emerald-600 text-white rounded text-[11px] font-bold">💡 100% SECRET</button>
+                <button onclick="addPresetCaption('NEW UPDATE', '#2563eb')" class="px-2 py-1 bg-blue-600 text-white rounded text-[11px] font-bold">🚀 NEW UPDATE</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stickers & Overlay Elements -->
+          <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-studio-border space-y-3">
+            <h3 class="text-sm font-bold text-gray-200 flex items-center gap-2">
+              <i class="fa-solid fa-icons text-emerald-400"></i>
+              <span>3. Add Graphics & Overlay Stickers</span>
+            </h3>
+            <div class="grid grid-cols-4 gap-2">
+              <button onclick="addSticker('arrow')" class="p-2 bg-studio-input border border-studio-border hover:border-emerald-500 rounded-lg text-center text-xs font-semibold">
+                <i class="fa-solid fa-arrow-trend-up text-red-500 text-lg block mb-1"></i> Red Arrow
+              </button>
+              <button onclick="addSticker('warning')" class="p-2 bg-studio-input border border-studio-border hover:border-emerald-500 rounded-lg text-center text-xs font-semibold">
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg block mb-1"></i> Warning
+              </button>
+              <button onclick="addSticker('play')" class="p-2 bg-studio-input border border-studio-border hover:border-emerald-500 rounded-lg text-center text-xs font-semibold">
+                <i class="fa-brands fa-youtube text-red-600 text-lg block mb-1"></i> YT Logo
+              </button>
+              <button onclick="addSticker('fire')" class="p-2 bg-studio-input border border-studio-border hover:border-emerald-500 rounded-lg text-center text-xs font-semibold">
+                <i class="fa-solid fa-fire text-orange-500 text-lg block mb-1"></i> Fire Emoji
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Canvas Studio Preview Workspace (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="glass-panel p-4 rounded-2xl border border-studio-border">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="text-xs font-bold uppercase tracking-wider text-gray-300">1280 x 720 Standard YouTube Canvas</span>
+              </div>
+              <button onclick="resetCanvas()" class="text-xs text-gray-400 hover:text-white">
+                <i class="fa-solid fa-rotate-left mr-1"></i>Reset Canvas
+              </button>
+            </div>
+
+            <!-- HTML5 Interactive Canvas Container -->
+            <div class="canvas-container rounded-xl overflow-hidden border border-studio-border shadow-2xl relative flex items-center justify-center">
+              <canvas id="thumbnail-canvas" width="1280" height="720" class="w-full h-auto object-contain cursor-crosshair"></canvas>
+            </div>
+
+            <!-- Interactive Canvas Tip -->
+            <p class="text-center text-xs text-gray-400 mt-3 flex items-center justify-center gap-1">
+              <i class="fa-solid fa-hand-pointer text-amber-400"></i>
+              Click and drag captions or stickers on canvas to move them around!
+            </p>
+          </div>
+
+          <!-- Image Filter Adjustments -->
+          <div class="glass-panel p-4 rounded-xl border border-studio-border">
+            <h4 class="text-xs font-bold text-gray-300 uppercase tracking-wider mb-3">Background Image Adjustments</h4>
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] text-gray-400 mb-1">Brightness</label>
+                <input type="range" id="bg-brightness" min="50" max="150" value="100" oninput="renderCanvas()" class="w-full accent-brand-500">
+              </div>
+              <div>
+                <label class="block text-[11px] text-gray-400 mb-1">Contrast</label>
+                <input type="range" id="bg-contrast" min="50" max="150" value="105" oninput="renderCanvas()" class="w-full accent-brand-500">
+              </div>
+              <div>
+                <label class="block text-[11px] text-gray-400 mb-1">Saturate</label>
+                <input type="range" id="bg-saturate" min="50" max="200" value="120" oninput="renderCanvas()" class="w-full accent-brand-500">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: SAVED PROJECTS & HISTORY -->
+    <section id="sec-saved" class="hidden space-y-6">
+      <div class="glass-panel p-6 rounded-2xl border border-studio-border">
+        <h2 class="text-2xl font-extrabold flex items-center gap-2">
+          <i class="fa-solid fa-bookmark text-amber-400"></i>
+          <span>Saved Scripts & Content Library</span>
+        </h2>
+        <p class="text-gray-400 text-sm mt-1">Access your saved viral video ideas and script drafts locally.</p>
+      </div>
+
+      <div id="saved-items-container" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- JS Populated -->
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    /* ==========================================================================
+       GLOBAL STATE & Gemini API CONFIGURATION
+       ========================================================================== */
+    const apiKey = ""; // API key automatically supplied by runtime
+    
+    // Inject Dynamic Web Manifest for PWA Support
+    (function injectManifest() {
+      const manifest = {
+        name: "CreatorSpark Studio AI",
+        short_name: "CreatorSpark",
+        description: "YouTube Viral Trends, Script AI & Thumbnail Designer",
+        start_url: "./",
+        display: "standalone",
+        background_color: "#0f0f12",
+        theme_color: "#f43f5e",
+        icons: [
+          { src: "https://placehold.co/192x192/f43f5e/ffffff?text=🔥", sizes: "192x192", type: "image/png" },
+          { src: "https://placehold.co/512x512/f43f5e/ffffff?text=🔥", sizes: "512x512", type: "image/png" }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = URL.createObjectURL(blob);
+      document.head.appendChild(link);
+    })();
+
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('btn-install-app');
+      if (btn) btn.classList.remove('hidden');
+    });
+
+    async function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          showToast("CreatorSpark installed to your device!", "success");
+        }
+        deferredPrompt = null;
+      } else {
+        showToast("To install on mobile/desktop: tap Browser Menu (⋮ or Share) → 'Add to Home Screen' / 'Install App'", "info");
+      }
+    }
+
+    // Service Worker Registration for Offline & PWA Execution
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swCode = `
+          const CACHE_NAME = 'creatorspark-v1';
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => self.clients.claim());
+          self.addEventListener('fetch', (e) => {
+            e.respondWith(caches.match(e.request).then(res => res || fetch(e.request).catch(() => res)));
+          });
+        `;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+      });
+    }
+
+    let activeTab = 'trends';
+    let currentScriptData = null;
+    let savedProjects = JSON.parse(localStorage.getItem('creatorspark_saved') || '[]');
+
+    // Canvas Engine State
+    const canvas = document.getElementById('thumbnail-canvas');
+    const ctx = canvas.getContext('2d');
+    let bgImageObj = null;
+    let canvasLayers = []; // Objects: { id, type: 'text'|'sticker', text, x, y, fontSize, fontFamily, color, strokeColor, strokeWidth, bgColor, hasBg, rotation, width, height, icon }
+    let selectedLayerId = null;
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    // Load Initial Canvas Defaults
+    window.onload = function() {
+      initDefaultCanvas();
+      renderSavedProjects();
+      setupCanvasEvents();
+    };
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('section[id^="sec-"]').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-brand-600', 'text-white', 'shadow');
+        btn.classList.add('text-gray-400');
+      });
+
+      document.getElementById(`sec-${tab}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      activeBtn.classList.add('bg-brand-600', 'text-white', 'shadow');
+      activeBtn.classList.remove('text-gray-400');
+
+      if (tab === 'thumbnail') {
+        renderCanvas();
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const colors = {
+        success: 'bg-emerald-600 text-white',
+        error: 'bg-rose-600 text-white',
+        info: 'bg-studio-card text-white border border-studio-border'
+      };
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transition-all transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+      toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-xmark' : 'fa-circle-info'}"></i> <span>${message}</span>`;
+
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    async function fetchGeminiAPI(endpoint, payload, retries = 3, delay = 1000) {
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${endpoint}:generateContent?key=${apiKey}`;
+      
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (res.ok) {
+            return await res.json();
+          }
+        } catch (err) {
+          if (i === retries - 1) throw err;
+        }
+        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+      }
+      throw new Error("Failed to reach Gemini API after retries.");
+    }
+
+    function quickTrend(query) {
+      document.getElementById('trend-query').value = query;
+      fetchTrends();
+    }
+
+    async function fetchTrends() {
+      const query = document.getElementById('trend-query').value.trim() || 'Latest viral trending content';
+      const niche = document.getElementById('trend-niche').value;
+      const loadingEl = document.getElementById('trends-loading');
+      const gridEl = document.getElementById('trends-results-grid');
+
+      loadingEl.classList.remove('hidden');
+      gridEl.innerHTML = '';
+
+      const systemPrompt = "You are a top YouTube content strategist. Find 5 highly trending video topics and content gaps based on live web search results. Output JSON format strictly.";
+      const userPrompt = `Search for current viral trends, high search volume queries, and video ideas in the "${niche}" niche related to "${query}". Return a JSON array with 5 items. Each item must have:
+      - "title": A high CTR video title idea
+      - "trendingReason": Why it is trending right now
+      - "viralHook": A catchy 1-sentence hook line
+      - "difficulty": "Easy", "Medium", or "High"
+      - "estimatedViews": e.g. "50K - 500K"
+      - "searchAngle": Key perspective or secret sauce`;
+
+      const payload = {
+        contents: [{ parts: [{ text: userPrompt }] }],
+        tools: [{ "google_search": {} }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "ARRAY",
+            items: {
+              type: "OBJECT",
+              properties: {
+                title: { type: "STRING" },
+                trendingReason: { type: "STRING" },
+                viralHook: { type: "STRING" },
+                difficulty: { type: "STRING" },
+                estimatedViews: { type: "STRING" },
+                searchAngle: { type: "STRING" }
+              },
+              propertyOrdering: ["title", "trendingReason", "viralHook", "difficulty", "estimatedViews", "searchAngle"]
+            }
+          }
+        }
+      };
+
+      try {
+        const result = await fetchGeminiAPI('gemini-3-flash-preview', payload);
+        loadingEl.classList.add('hidden');
+
+        const candidate = result.candidates?.[0];
+        if (candidate && candidate.content?.parts?.[0]?.text) {
+          const trendsArray = JSON.parse(candidate.content.parts[0].text);
+          renderTrendCards(trendsArray);
+          showToast("Discovered 5 fresh trends!", "success");
+        } else {
+          showToast("Could not parse trends. Try another keyword.", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        loadingEl.classList.add('hidden');
+        showToast("Error fetching real-time trends. Please try again.", "error");
+      }
+    }
+
+    function renderTrendCards(trends) {
+      const gridEl = document.getElementById('trends-results-grid');
+      gridEl.innerHTML = trends.map((t, idx) => `
+        <div class="glass-panel p-5 rounded-2xl border border-studio-border flex flex-col justify-between space-y-4 hover:border-brand-500/50 transition-all group">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-brand-900/60 border border-brand-700/50 text-brand-400">
+                #${idx + 1} Trending Angle
+              </span>
+              <span class="text-xs text-gray-400 font-semibold flex items-center gap-1">
+                <i class="fa-solid fa-chart-line text-emerald-400"></i> ${t.estimatedViews || 'High Growth'}
+              </span>
+            </div>
+
+            <h3 class="text-base font-bold text-gray-100 group-hover:text-brand-500 transition-colors line-clamp-2">
+              ${t.title}
+            </h3>
+
+            <p class="text-xs text-gray-400 leading-relaxed">
+              <strong class="text-gray-300">Why Viral:</strong> ${t.trendingReason}
+            </p>
+
+            <div class="p-3 bg-studio-card rounded-xl border border-studio-border text-xs italic text-gray-300">
+              <i class="fa-solid fa-quote-left text-brand-500 mr-1.5 opacity-60"></i>
+              "${t.viralHook}"
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-studio-border flex items-center justify-between">
+            <span class="text-[11px] text-gray-500">
+              Effort: <strong class="text-gray-300">${t.difficulty || 'Medium'}</strong>
+            </span>
+
+            <button onclick="useTrendForScript('${encodeURIComponent(t.title)}')" class="bg-studio-input hover:bg-brand-600 border border-studio-border hover:border-brand-500 text-xs text-gray-200 hover:text-white font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all">
+              <i class="fa-solid fa-pen"></i> Write Script
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function useTrendForScript(encodedTitle) {
+      const title = decodeURIComponent(encodedTitle);
+      document.getElementById('script-topic').value = title;
+      switchTab('script');
+      generateScript();
+    }
+
+    async function generateScript() {
+      const topic = document.getElementById('script-topic').value.trim();
+      const style = document.getElementById('script-style').value;
+      
+      if (!topic) {
+        showToast("Please enter a video topic title!", "error");
+        return;
+      }
+
+      const loadingEl = document.getElementById('script-loading');
+      loadingEl.classList.remove('hidden');
+
+      const systemPrompt = "You are a professional YouTube scriptwriter & SEO strategist. Generate a complete high-retention script breakdown with timestamped visual cues and metadata in JSON.";
+      const userPrompt = `Topic: "${topic}"\nStyle: "${style}"\n
+      Return JSON schema with:
+      - "titles": Array of 5 punchy, high CTR title variations
+      - "hook": Script for 0-15s hook designed to maximize audience retention
+      - "intro": Script for 15-45s setting the stakes
+      - "mainBody": Markdown formatted script with timestamped sections, B-Roll visual cues in brackets [Visual: ...], and Sound Effects [SFX: ...]
+      - "outroCta": Outro script with call to action
+      - "seoDescription": Optimised YouTube video description with timestamps
+      - "tags": Array of 10 relevant tags
+      - "thumbnailIdeas": Array of 3 visual thumbnail concepts (visual prompt + text hook)`;
+
+      const payload = {
+        contents: [{ parts: [{ text: userPrompt }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              titles: { type: "ARRAY", items: { type: "STRING" } },
+              hook: { type: "STRING" },
+              intro: { type: "STRING" },
+              mainBody: { type: "STRING" },
+              outroCta: { type: "STRING" },
+              seoDescription: { type: "STRING" },
+              tags: { type: "ARRAY", items: { type: "STRING" } },
+              thumbnailIdeas: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    visual: { type: "STRING" },
+                    textOverlay: { type: "STRING" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      };
+
+      try {
+        const result = await fetchGeminiAPI('gemini-3-flash-preview', payload);
+        loadingEl.classList.add('hidden');
+
+        const candidate = result.candidates?.[0];
+        if (candidate && candidate.content?.parts?.[0]?.text) {
+          currentScriptData = JSON.parse(candidate.content.parts[0].text);
+          renderScriptData(currentScriptData);
+          showToast("YouTube Script generated successfully!", "success");
+        }
+      } catch (err) {
+        console.error(err);
+        loadingEl.classList.add('hidden');
+        showToast("Error generating script. Please retry.", "error");
+      }
+    }
+
+    function renderScriptData(data) {
+      // Titles
+      const titlesEl = document.getElementById('titles-container');
+      titlesEl.innerHTML = data.titles.map(t => `
+        <div onclick="copyText('${t}')" class="p-2.5 bg-studio-input hover:bg-studio-border border border-studio-border rounded-lg text-xs font-semibold cursor-pointer flex items-center justify-between group transition-colors">
+          <span>${t}</span>
+          <i class="fa-solid fa-copy opacity-0 group-hover:opacity-100 text-brand-500"></i>
+        </div>
+      `).join('');
+
+      // Hook
+      document.getElementById('script-hook-text').innerText = data.hook;
+
+      // Body Script
+      document.getElementById('script-body-text').innerHTML = `
+        <div class="mb-3 text-xs text-rose-400 font-bold uppercase"><i class="fa-solid fa-play mr-1"></i> Intro (15-45s)</div>
+        <p class="mb-4 text-gray-200">${data.intro}</p>
+        <div class="mb-3 text-xs text-amber-400 font-bold uppercase"><i class="fa-solid fa-list-check mr-1"></i> Main Content & B-Roll Cues</div>
+        <div class="text-gray-300 space-y-2 whitespace-pre-line font-sans">${data.mainBody}</div>
+        <div class="mt-4 mb-2 text-xs text-emerald-400 font-bold uppercase"><i class="fa-solid fa-flag-checkered mr-1"></i> Call To Action / Outro</div>
+        <p class="text-gray-200">${data.outroCta}</p>
+      `;
+
+      // Thumbnail Concepts
+      const thumbIdeasEl = document.getElementById('thumbnail-concepts');
+      thumbIdeasEl.innerHTML = data.thumbnailIdeas.map((idea, i) => `
+        <div class="p-3 bg-studio-input rounded-xl border border-studio-border space-y-1.5">
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="font-bold text-amber-400">Concept #${i + 1}</span>
+            <span class="bg-brand-900/50 text-brand-400 px-1.5 py-0.5 rounded font-mono">${idea.textOverlay}</span>
+          </div>
+          <p class="text-[11px] text-gray-400 leading-snug">${idea.visual}</p>
+          <button onclick="applyThumbnailConcept('${encodeURIComponent(idea.visual)}', '${encodeURIComponent(idea.textOverlay)}')" class="w-full mt-1 bg-studio-border hover:bg-brand-600 text-white py-1 rounded text-[10px] font-bold transition-colors">
+            Use This Concept in Studio
+          </button>
+        </div>
+      `).join('');
+
+      // SEO & Tags
+      document.getElementById('script-seo-text').innerText = `${data.seoDescription}\n\nTAGS:\n${data.tags.join(', ')}`;
+    }
+
+    function listenScriptAudio() {
+      if (!currentScriptData || !currentScriptData.hook) {
+        showToast("Generate a script first to listen!", "error");
+        return;
+      }
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(currentScriptData.hook);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+        showToast("Playing audio hook...", "info");
+      } else {
+        showToast("Text-to-speech not supported in browser.", "error");
+      }
+    }
+
+    function applyThumbnailConcept(visualEnc, textOverlayEnc) {
+      const visual = decodeURIComponent(visualEnc);
+      const textOverlay = decodeURIComponent(textOverlayEnc);
+
+      document.getElementById('thumb-ai-prompt').value = visual;
+      switchTab('thumbnail');
+
+      // Add concept text to canvas
+      addPresetCaption(textOverlay, '#ff0033');
+      showToast("Concept applied! Click 'Generate AI BG' to create visual.", "info");
+    }
+
+    function transferToThumbnail() {
+      const topic = document.getElementById('script-topic').value || 'YouTube Viral Video';
+      document.getElementById('thumb-ai-prompt').value = `High contrast YouTube thumbnail graphic for: "${topic}", cinematic lighting, vibrant saturated colors, 8k resolution`;
+      switchTab('thumbnail');
+    }
+
+    async function generateAiThumbnailBg() {
+      const prompt = document.getElementById('thumb-ai-prompt').value.trim();
+      if (!prompt) {
+        showToast("Enter a visual prompt for thumbnail!", "error");
+        return;
+      }
+
+      const btn = document.getElementById('btn-gen-thumb-bg');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Generating...`;
+
+      const payload = {
+        contents: [{
+          parts: [{ text: `YouTube thumbnail graphic, high CTR, vivid color, 16:9 ratio: ${prompt}` }]
+        }],
+        generationConfig: {
+          responseModalities: ['IMAGE'],
+          imageConfig: { aspectRatio: "16:9" }
+        }
+      };
+
+      try {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${apiKey}`;
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        const base64Data = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData)?.inlineData?.data;
+
+        if (base64Data) {
+          const img = new Image();
+          img.onload = function() {
+            bgImageObj = img;
+            renderCanvas();
+            showToast("AI Thumbnail background generated!", "success");
+          };
+          img.src = `data:image/png;base64,${base64Data}`;
+        } else {
+          showToast("Image generation failed. Try a different prompt.", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Error generating image.", "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-image"></i> Generate AI BG`;
+      }
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            bgImageObj = img;
+            renderCanvas();
+            showToast("Custom background uploaded!", "success");
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function initDefaultCanvas() {
+      // Set default dark gradient background image canvas placeholder
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = 1280;
+      tempCanvas.height = 720;
+      const tCtx = tempCanvas.getContext('2d');
+      
+      const grad = tCtx.createLinearGradient(0, 0, 1280, 720);
+      grad.addColorStop(0, '#111827');
+      grad.addColorStop(0.5, '#881337');
+      grad.addColorStop(1, '#0f172a');
+      tCtx.fillStyle = grad;
+      tCtx.fillRect(0, 0, 1280, 720);
+
+      const img = new Image();
+      img.onload = () => {
+        bgImageObj = img;
+        // Default sample layer
+        canvasLayers = [
+          {
+            id: 'layer_1',
+            type: 'text',
+            text: 'SECRET REVEALED!',
+            x: 640,
+            y: 360,
+            fontSize: 85,
+            fontFamily: 'Impact',
+            color: '#ffffff',
+            strokeColor: '#000000',
+            strokeWidth: 10,
+            bgColor: '#ff0033',
+            hasBg: true,
+            rotation: -4
+          }
+        ];
+        selectLayer('layer_1');
+        renderCanvas();
+      };
+      img.src = tempCanvas.toDataURL();
+    }
+
+    function addTextLayer() {
+      const id = 'layer_' + Date.now();
+      const newLayer = {
+        id,
+        type: 'text',
+        text: 'NEW CAPTION',
+        x: 640,
+        y: 200 + (canvasLayers.length * 40) % 300,
+        fontSize: 70,
+        fontFamily: 'Impact',
+        color: '#ffffff',
+        strokeColor: '#000000',
+        strokeWidth: 8,
+        bgColor: '#ff0033',
+        hasBg: false,
+        rotation: 0
+      };
+      canvasLayers.push(newLayer);
+      selectLayer(id);
+      renderCanvas();
+      showToast("Caption added to canvas!", "info");
+    }
+
+    function addPresetCaption(text, color) {
+      const id = 'layer_' + Date.now();
+      const newLayer = {
+        id,
+        type: 'text',
+        text: text,
+        x: 640,
+        y: 360,
+        fontSize: 80,
+        fontFamily: 'Anton',
+        color: '#ffffff',
+        strokeColor: '#000000',
+        strokeWidth: 10,
+        bgColor: color,
+        hasBg: true,
+        rotation: -3
+      };
+      canvasLayers.push(newLayer);
+      selectLayer(id);
+      renderCanvas();
+    }
+
+    function addSticker(type) {
+      const id = 'layer_' + Date.now();
+      const newLayer = {
+        id,
+        type: 'sticker',
+        stickerType: type,
+        x: 300 + (canvasLayers.length * 50) % 600,
+        y: 360,
+        fontSize: 100,
+        rotation: 0
+      };
+      canvasLayers.push(newLayer);
+      selectLayer(id);
+      renderCanvas();
+    }
+
+    function selectLayer(id) {
+      selectedLayerId = id;
+      const layer = canvasLayers.find(l => l.id === id);
+      const deleteBtn = document.getElementById('btn-delete-layer');
+      
+      if (layer && layer.type === 'text') {
+        document.getElementById('selected-layer-title').innerText = `Editing: "${layer.text}"`;
+        document.getElementById('layer-text-input').value = layer.text;
+        document.getElementById('layer-font-family').value = layer.fontFamily;
+        document.getElementById('layer-font-size').value = layer.fontSize;
+        document.getElementById('layer-text-color').value = layer.color;
+        document.getElementById('layer-stroke-color').value = layer.strokeColor;
+        document.getElementById('layer-bg-color').value = layer.bgColor;
+        document.getElementById('layer-stroke-width').value = layer.strokeWidth;
+        document.getElementById('layer-rotation').value = layer.rotation;
+        document.getElementById('layer-has-bg').checked = layer.hasBg;
+        deleteBtn.classList.remove('hidden');
+      } else if (layer && layer.type === 'sticker') {
+        document.getElementById('selected-layer-title').innerText = `Editing Sticker`;
+        deleteBtn.classList.remove('hidden');
+      } else {
+        document.getElementById('selected-layer-title').innerText = "Select a layer to edit";
+        deleteBtn.classList.add('hidden');
+      }
+    }
+
+    function updateActiveLayer() {
+      if (!selectedLayerId) return;
+      const layer = canvasLayers.find(l => l.id === selectedLayerId);
+      if (!layer || layer.type !== 'text') return;
+
+      layer.text = document.getElementById('layer-text-input').value || 'CAPTION';
+      layer.fontFamily = document.getElementById('layer-font-family').value;
+      layer.fontSize = parseInt(document.getElementById('layer-font-size').value, 10);
+      layer.color = document.getElementById('layer-text-color').value;
+      layer.strokeColor = document.getElementById('layer-stroke-color').value;
+      layer.bgColor = document.getElementById('layer-bg-color').value;
+      layer.strokeWidth = parseInt(document.getElementById('layer-stroke-width').value, 10);
+      layer.rotation = parseInt(document.getElementById('layer-rotation').value, 10);
+      layer.hasBg = document.getElementById('layer-has-bg').checked;
+
+      renderCanvas();
+    }
+
+    function deleteSelectedLayer() {
+      if (!selectedLayerId) return;
+      canvasLayers = canvasLayers.filter(l => l.id !== selectedLayerId);
+      selectedLayerId = null;
+      selectLayer(null);
+      renderCanvas();
+      showToast("Layer deleted", "info");
+    }
+
+    function resetCanvas() {
+      initDefaultCanvas();
+      showToast("Canvas reset to defaults.", "info");
+    }
+
+    function renderCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Background Image with CSS Filters
+      if (bgImageObj) {
+        const bright = document.getElementById('bg-brightness').value;
+        const contrast = document.getElementById('bg-contrast').value;
+        const saturate = document.getElementById('bg-saturate').value;
+
+        ctx.filter = `brightness(${bright}%) contrast(${contrast}%) saturate(${saturate}%)`;
+        ctx.drawImage(bgImageObj, 0, 0, canvas.width, canvas.height);
+        ctx.filter = 'none';
+      }
+
+      // Render Each Layer
+      canvasLayers.forEach(layer => {
+        ctx.save();
+        ctx.translate(layer.x, layer.y);
+        ctx.rotate((layer.rotation * Math.PI) / 180);
+
+        if (layer.type === 'text') {
+          ctx.font = `900 ${layer.fontSize}px '${layer.fontFamily}', sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          const metrics = ctx.measureText(layer.text);
+          const paddingX = 24;
+          const paddingY = 16;
+          const bgWidth = metrics.width + paddingX * 2;
+          const bgHeight = layer.fontSize + paddingY;
+
+          // Save bounding box dimensions for drag detection
+          layer.bbox = {
+            width: bgWidth,
+            height: bgHeight
+          };
+
+          // Draw Badge Background Pill if enabled
+          if (layer.hasBg) {
+            ctx.fillStyle = layer.bgColor;
+            ctx.shadowColor = 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetY = 6;
+            
+            // Draw rounded rectangle badge
+            const rx = -bgWidth / 2;
+            const ry = -bgHeight / 2;
+            ctx.beginPath();
+            ctx.roundRect(rx, ry, bgWidth, bgHeight, 12);
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
+          }
+
+          // Text Stroke / Outline
+          if (layer.strokeWidth > 0) {
+            ctx.strokeStyle = layer.strokeColor;
+            ctx.lineWidth = layer.strokeWidth;
+            ctx.lineJoin = 'round';
+            ctx.strokeText(layer.text, 0, 0);
+          }
+
+          // Text Fill
+          ctx.fillStyle = layer.color;
+          ctx.fillText(layer.text, 0, 0);
+
+          // Selection Box Highlight
+          if (layer.id === selectedLayerId) {
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 6]);
+            ctx.strokeRect(-bgWidth / 2 - 6, -bgHeight / 2 - 6, bgWidth + 12, bgHeight + 12);
+          }
+
+        } else if (layer.type === 'sticker') {
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          let stickerChar = '🔥';
+          if (layer.stickerType === 'arrow') stickerChar = '↗️';
+          if (layer.stickerType === 'warning') stickerChar = '⚠️';
+          if (layer.stickerType === 'play') stickerChar = '▶️';
+
+          ctx.font = `${layer.fontSize}px sans-serif`;
+          ctx.fillText(stickerChar, 0, 0);
+
+          layer.bbox = { width: layer.fontSize, height: layer.fontSize };
+
+          if (layer.id === selectedLayerId) {
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 6]);
+            ctx.strokeRect(-layer.fontSize / 2 - 4, -layer.fontSize / 2 - 4, layer.fontSize + 8, layer.fontSize + 8);
+          }
+        }
+
+        ctx.restore();
+      });
+    }
+
+    function setupCanvasEvents() {
+      function getCanvasCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY
+        };
+      }
+
+      function handleStart(e) {
+        const { x, y } = getCanvasCoords(e);
+        
+        // Find layer hit (topmost first)
+        for (let i = canvasLayers.length - 1; i >= 0; i--) {
+          const l = canvasLayers[i];
+          const w = l.bbox ? l.bbox.width : 100;
+          const h = l.bbox ? l.bbox.height : 80;
+
+          if (x >= l.x - w / 2 && x <= l.x + w / 2 && y >= l.y - h / 2 && y <= l.y + h / 2) {
+            selectLayer(l.id);
+            isDragging = true;
+            dragOffsetX = x - l.x;
+            dragOffsetY = y - l.y;
+            renderCanvas();
+            return;
+          }
+        }
+
+        selectLayer(null);
+        renderCanvas();
+      }
+
+      function handleMove(e) {
+        if (!isDragging || !selectedLayerId) return;
+        const { x, y } = getCanvasCoords(e);
+        const layer = canvasLayers.find(l => l.id === selectedLayerId);
+        if (layer) {
+          layer.x = x - dragOffsetX;
+          layer.y = y - dragOffsetY;
+          renderCanvas();
+        }
+      }
+
+      function handleEnd() {
+        isDragging = false;
+      }
+
+      canvas.addEventListener('mousedown', handleStart);
+      canvas.addEventListener('mousemove', handleMove);
+      window.addEventListener('mouseup', handleEnd);
+
+      canvas.addEventListener('touchstart', handleStart, { passive: true });
+      canvas.addEventListener('touchmove', handleMove, { passive: true });
+      window.addEventListener('touchend', handleEnd);
+    }
+
+    function downloadThumbnail() {
+      // Temporarily deselect layer so bounding boxes aren't exported
+      const activeId = selectedLayerId;
+      selectedLayerId = null;
+      renderCanvas();
+
+      const imageURI = canvas.toDataURL("image/png");
+      const link = document.createElement('a');
+      link.download = `YouTube_Thumbnail_${Date.now()}.png`;
+      link.href = imageURI;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Restore selection
+      selectedLayerId = activeId;
+      renderCanvas();
+
+      showToast("High-res 1280x720 PNG Downloaded!", "success");
+    }
+
+    function saveCurrentScript() {
+      if (!currentScriptData) {
+        showToast("No script generated to save!", "error");
+        return;
+      }
+
+      const project = {
+        id: 'proj_' + Date.now(),
+        date: new Date().toLocaleDateString(),
+        title: document.getElementById('script-topic').value || currentScriptData.titles[0],
+        script: currentScriptData
+      };
+
+      savedProjects.unshift(project);
+      localStorage.setItem('creatorspark_saved', JSON.stringify(savedProjects));
+      renderSavedProjects();
+      showToast("Script saved to library!", "success");
+    }
+
+    function renderSavedProjects() {
+      const container = document.getElementById('saved-items-container');
+      if (savedProjects.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center glass-panel rounded-2xl border border-studio-border">
+            <i class="fa-solid fa-folder-open text-3xl text-gray-500 mb-2"></i>
+            <p class="text-gray-400 text-sm">No saved scripts yet. Click "Save Script" when writing scripts!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = savedProjects.map(p => `
+        <div class="glass-panel p-5 rounded-2xl border border-studio-border space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-brand-500">${p.date}</span>
+            <button onclick="deleteSavedProject('${p.id}')" class="text-xs text-rose-400 hover:text-rose-300">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+
+          <h3 class="text-base font-bold text-gray-100">${p.title}</h3>
+
+          <p class="text-xs text-gray-400 line-clamp-3 leading-relaxed">
+            ${p.script.hook}
+          </p>
+
+          <div class="pt-2 flex justify-end">
+            <button onclick="loadSavedProject('${p.id}')" class="bg-studio-input hover:bg-studio-border border border-studio-border text-xs text-white px-3 py-1.5 rounded-lg font-semibold">
+              Open Script
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function loadSavedProject(id) {
+      const p = savedProjects.find(item => item.id === id);
+      if (p) {
+        currentScriptData = p.script;
+        document.getElementById('script-topic').value = p.title;
+        renderScriptData(p.script);
+        switchTab('script');
+        showToast("Loaded script from saved library", "info");
+      }
+    }
+
+    function deleteSavedProject(id) {
+      savedProjects = savedProjects.filter(item => item.id !== id);
+      localStorage.setItem('creatorspark_saved', JSON.stringify(savedProjects));
+      renderSavedProjects();
+      showToast("Removed project", "info");
+    }
+
+    function copyText(str) {
+      const el = document.createElement('textarea');
+      el.value = str;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast("Copied to clipboard!", "success");
+    }
+
+    function copyElementText(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      copyText(text);
+    }
+  </script>
+</body>
+</html>
